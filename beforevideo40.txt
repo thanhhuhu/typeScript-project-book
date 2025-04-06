@@ -1,0 +1,163 @@
+main.tsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import {
+    createBrowserRouter,
+    RouterProvider,
+} from "react-router-dom";
+import Layout from "./layout.tsx";
+import BookPage from "./pages/client/book.tsx";
+import AboutPage from "./pages/client/about.tsx";
+import LoginPage from "./pages/client/auth/login.tsx";
+import RegisterPage from "./pages/client/auth/register.tsx";
+import HomePage from "./pages/client/home.tsx";
+import {App} from "antd";
+import {AppProvider} from "./components/context/app.context.tsx";
+import ProtectedRoute from "./components/auth";
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <Layout />,
+        children: [
+            {
+                index: true,
+                element: <HomePage />,
+            },
+            {
+                path: "/book",
+                element: <BookPage />,
+            },
+            {
+                path: "/about",
+                element: <AboutPage />,
+            },
+            {
+                path:"/checkout",
+                element:(
+                    <ProtectedRoute>
+                        <div>checkout page</div>
+                    </ProtectedRoute>
+                   ),
+            },
+            {
+                path:"/admin",
+                element: (
+                    <ProtectedRoute>
+                        <div>admin page</div>
+                    </ProtectedRoute>
+                ),
+            }
+        ],
+    },
+    {
+        path: "/login",
+        element: <LoginPage/>,
+    },
+    {
+        path: "/register",
+        element:  <RegisterPage/>,
+
+    },
+
+]);
+createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+        <App>
+            <AppProvider>
+                <RouterProvider router={router} />
+            </AppProvider>
+        </App>
+    </StrictMode>,
+)
+layout.tsx
+import {Outlet} from "react-router-dom"
+import AppHeader from "./components/layout/app.header.tsx";
+import {useEffect} from "react";
+import {fetchAccountAPI} from "./services/api.ts";
+import {useCurrentApp} from "./components/context/app.context.tsx";
+import {PacmanLoader} from "react-spinners";
+
+function Layout  () {
+    const {setUser,setIsAuthenticated,isAppLoading,setIsAppLoading} = useCurrentApp()
+    useEffect(() => {
+        const fetchAccount = async () => {
+            const res = await fetchAccountAPI()
+            console.log(res)
+            if (res.data)
+            {
+                setUser(res.data.user)
+                setIsAuthenticated(true)
+            }
+            setIsAppLoading(false)
+        };
+        fetchAccount();
+    }, [setUser, setIsAuthenticated, setIsAppLoading]);
+    return (
+        <>
+            {isAppLoading ? (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                    }}
+                >
+                    <PacmanLoader size={50}  color="blue" />
+                </div>
+            ) : (
+                <div>
+                    <AppHeader />
+                    <Outlet />
+                </div>
+            )}
+        </>
+
+
+    )
+}
+export default Layout
+
+app.context.tsx
+
+import {createContext, useContext, useState} from "react";
+import * as React from "react";
+
+interface IAppContext {
+    isAuthenticated:boolean;
+    setIsAuthenticated:(v: boolean) => void;
+    setUser: (v: IUser) => void;
+    user:IUser | null;
+    isAppLoading: boolean;
+    setIsAppLoading: (v:boolean) => void;
+}
+
+const CurrentAppContext = createContext<IAppContext | null>(null);
+
+type TProps = {
+    children: React.ReactNode
+}
+export const AppProvider = (props: TProps) => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+    const [user, setUser] = useState<IUser | null>(null);
+    const [isAppLoading, setIsAppLoading] = useState<boolean>(true)
+    return (
+        <CurrentAppContext.Provider value={{
+            isAuthenticated, user, setIsAuthenticated, setUser,
+            isAppLoading, setIsAppLoading
+        } }>
+            {props.children}
+        </CurrentAppContext.Provider>
+    );
+};
+export const useCurrentApp = () => {
+    const currentAppContext = useContext(CurrentAppContext);
+
+    if (!currentAppContext) {
+        throw new Error(
+            "useCurrentApp has to be used within <CurrentAppContext.Provider>"
+        );
+    }
+
+    return currentAppContext;
+};

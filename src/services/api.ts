@@ -1,5 +1,5 @@
 import axios from '../services/axios.customize.ts'
-import {IRegister} from "../types/global";
+import {IRegister, IResponseImport} from "../types/global";
 import {ILogin} from "../types/global";
 export const registerAPI =
     (fullName: string,
@@ -24,4 +24,31 @@ export const fetchAccountAPI = async () => {
             delay: 1000
         }
     });
+}
+export const logoutAPI = ()=> {
+    const urlBackend = "/api/v1/auth/logout";
+    return axios.post<IBackendRes<IRegister>> (urlBackend)
+}
+export const getUsersAPI = (query:string)=> {
+    const urlBackend = `/api/v1/user?${query}`;
+    return axios.get<IBackendRes<IModelPaginate<IUserTable>>>(urlBackend)
+}
+export const createUserAPI = (
+    fullName: string,
+    password: string,
+    email: string,
+    phone: string
+) =>{
+    const urlBackend = "/api/v1/user";
+    return axios.post<IBackendRes<IRegister>>(urlBackend, {fullName, password,email, phone})
+}
+export const bulkCreateUserAPI = (
+    data: {
+        fullName: string,
+        password: string,
+        email: string,
+        phone: string,
+    }[]) =>{
+    const urlBackend = "/api/v1/user/bulk-create";
+    return axios.post<IBackendRes<IResponseImport>>(urlBackend, data)
 }

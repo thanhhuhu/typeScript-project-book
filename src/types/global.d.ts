@@ -44,6 +44,22 @@ declare global {
     interface IFetchAccount{
         user:IUser;
     }
+    interface IUserTable{
+        id: string;
+        fullname: string;
+        email: string;
+        phone: string;
+        role: string;
+        avatar: string;
+        isActive:boolean;
+        createdAt: Date;
+        updatedAt: Date;
+    }
+    interface IResponseImport{
+        countSuccess: number
+        countError: number
+        detail: any
+    }
 }
 
 
