@@ -46,19 +46,44 @@ declare global {
     }
     interface IUserTable{
         id: string;
-        fullname: string;
+        fullName: string;
         email: string;
+        price:string;
         phone: string;
         role: string;
         avatar: string;
         isActive:boolean;
         createdAt: Date;
         updatedAt: Date;
+        _id:string;
+        mainText: string;
+        author:string;
+        category:string;
+        thumbnail:any;
+        slider:any;
     }
     interface IResponseImport{
         countSuccess: number
         countError: number
         detail: any
+    }
+    interface IBookTable{
+        _id: string;
+        thumbnail:string;
+        slider:string[];
+        mainText:string;
+        author:string;
+        price:string;
+        sold:string;
+        quantity:string;
+        category:string;
+        createdAt: Date;
+        updatedAt: Date;
+    }
+    interface ICreateBook {
+        _id: string;
+        mainText: string;
+        author: string;
     }
 }
 

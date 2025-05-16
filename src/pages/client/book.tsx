@@ -1,7 +1,37 @@
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import BookDetail from "./book/book.detail.tsx";
+import {getBookByIdAPI} from "../../services/api.ts";
+import {App, notification} from "antd";
 
 const BookPage = () => {
+    let {id} = useParams()
+    const {notification} ] = App.useApp()
+    const [currentBook, setCurrentBook] = useState<IBookTable | null>(null);
+
+    useEffect(() => {
+        if(id){
+            const fetchBookByAPI = async () =>{
+                const res = await getBookByIdAPI(id)
+                if ( res && res.data){
+                    setCurrentBook(res.data)
+                }else {
+                    setCurrentBook(null)
+                    notification.error ({
+                        message:'Book not found!',
+                        description:'No book found.'
+                    })
+                }
+            }
+            fetchBookByAPI();
+        }
+    },[id])
     return (
-        <div>Book page</div>
+        <div>
+            <BookDetail
+
+            />
+        </div>
     )
 }
 export default BookPage

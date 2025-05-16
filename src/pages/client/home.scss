@@ -1,0 +1,121 @@
+/* Container for the book items */
+.customize-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* Individual book item styling */
+.column {
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Wrapper for each book */
+.wrapper {
+  border: 1px solid #eee;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  height: 100%;
+
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Hover effect for the book item */
+.wrapper:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Thumbnail (Book cover) styling */
+.thumbnail {
+  height: 180px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.thumbnail img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Title of the book */
+.text {
+  font-weight: 600;
+  font-size: 16px;
+  min-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* Price styling */
+.price {
+  color: #f44336;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Rating styling */
+.rating {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #999;
+}
+
+.rating .ant-rate {
+  color: gold;
+}
+
+/* Sold count styling */
+.rating span {
+  margin-left: 8px;
+  color: #555;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 12px;
+  }
+
+  .text {
+    font-size: 14px;
+  }
+
+  .price {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wrapper {
+    padding: 10px;
+  }
+
+  .thumbnail {
+    height: 150px;
+  }
+
+  .text {
+    font-size: 12px;
+  }
+
+  .price {
+    font-size: 12px;
+  }
+}

@@ -1,9 +1,9 @@
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import {App, Button, Popconfirm} from 'antd';
 import {useRef, useState} from 'react';
-import {getUsersAPI} from "../../../services/api.ts";
+import {deleteUserAPI, getUsersAPI} from "../../../services/api.ts";
 import {MdAutoFixHigh, MdDelete} from "react-icons/md";
 import {dateRangeValidate} from "../../../services/helpers.ts";
 import DetailUser from "./detail.user.tsx";
@@ -11,6 +11,7 @@ import CreateUser from "./create.user.tsx";
 import {AiOutlineExport} from "react-icons/ai";
 import {CiImport} from "react-icons/ci";
 import ImportUser from "./import.user.tsx";
+import UpdateUser from "./update.user.tsx";
 
 type TSearch = {
     fullName: string;
@@ -37,7 +38,27 @@ const TableUser = (props:IProps) => {
     const [dataViewDetail, setDataViewDetail] = useState<IUserTable | null>(null);
     const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
     const [openModalImport, setOpenModalImport] = useState<boolean>(false);
-    const {dataImport, setDataImport} = props;
+    const [openModalUpdate, setOpenModalUpdate] = useState<boolean>(false);
+    const [dataDetailUpdate, setDataDetailUpdate] =  useState<IUserTable | null >(null);
+    const [deleteUser, setDeleteUser] =useState<boolean>(false);
+    //Using api show message and notification from Antd
+    const {message, notification} = App.useApp()
+    //Function delete user
+    const handleDeleteUser = async (_id: string) => {
+        setDeleteUser(true)
+        const res = await deleteUserAPI (_id)
+        if ( res && res.data){
+            message.success("Delete user successfully!")
+            refreshTable()
+        }else {
+            notification.error({
+                message: 'Delete user failed!',
+                description:res.message
+            })
+        }
+        setDeleteUser(false)
+    }
+    //Table include user
     const columns: ProColumns<IUserTable>[] = [
         {
             dataIndex: 'index',
@@ -48,7 +69,7 @@ const TableUser = (props:IProps) => {
             title: 'Id',
             dataIndex: '_id',
             hideInSearch: true,
-            render(dom,entity,index,action,schema){
+            render(dom,entity){
                 return (
                     <a href="#"
                        onClick={() => {
@@ -85,17 +106,28 @@ const TableUser = (props:IProps) => {
             title: 'Action',
             tooltip: '',
             hideInSearch: true,
-            render:(params) => (
+            render:(entity) => (
                 <>
                     <div>
                         <MdAutoFixHigh
                             style={{cursor: 'pointer', fontSize: 20, marginLeft: '10px'}}
-                            onClick={() => {}}
+                            onClick={() => {
+                                setDataDetailUpdate(entity)
+                                setOpenModalUpdate(true)
+                            }
+                        }
                         />
-                        <MdDelete
-                            style={{cursor: 'pointer', fontSize: 20}}
-                            onClick={() => {}}
-                        />
+                        <Popconfirm
+                            title={"Confirm delete user!"}
+                            onConfirm={() => handleDeleteUser(entity._id)}
+                            okText = "Confirm!"
+                            cancelText="Cancel"
+                            okButtonProps={{loading:deleteUser}}
+                        >
+                            <MdDelete
+                                style={{cursor: 'pointer', fontSize: 20}}
+                            />
+                        </Popconfirm>
                     </div>
                 </>
             )
@@ -112,6 +144,7 @@ const TableUser = (props:IProps) => {
                 cardBordered
                 request={async (params, sort, filter) => {
                     console.log(params,sort, filter);
+                    // create query to find
                     let query =""
                     if (params) {
                         query += `current=${params.current}&pageSize=${params.pageSize}`;
@@ -144,14 +177,14 @@ const TableUser = (props:IProps) => {
                     }
 
                 }}
-                rowKey="id"
+                rowKey="_id"
                 pagination={{
                     current: meta.current,
                     pageSize:meta.pageSize,
                     showSizeChanger:true,
                     total: meta.total,
                     showTotal:(total,range) => {
-                        return (<div>{range[0]}-{range[1]} trên {total} rows</div>)
+                        return (<div>{range[0]}-{range[1]} on {total} rows</div>)
                     }
                 }}
                 headerTitle="Table user"
@@ -202,6 +235,13 @@ const TableUser = (props:IProps) => {
                 openModalImport={openModalImport}
                 setOpenModalImport={setOpenModalImport}
                 refreshTable={refreshTable}
+            />
+            <UpdateUser
+                openModalUpdate ={openModalUpdate}
+                setOpenModalUpdate={setOpenModalUpdate}
+                dataDetailUpdate = {dataDetailUpdate}
+                setDataDetailUpdate={setDataDetailUpdate}
+                refreshTable = {refreshTable}
             />
         </>
     );

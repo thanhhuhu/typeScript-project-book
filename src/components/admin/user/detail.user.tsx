@@ -26,7 +26,7 @@ const DetailUser = (props: IProps) => {
                     <Descriptions title="User Info">
                         <Descriptions.Item label="Id">{dataViewDetail?._id} </Descriptions.Item>
                         <Descriptions.Item label="Email">{dataViewDetail?.email} </Descriptions.Item>
-                        <Descriptions.Item label="FullName">{dataViewDetail?.fullname}</Descriptions.Item>
+                        <Descriptions.Item label="FullName">{dataViewDetail?.fullName}</Descriptions.Item>
                         <Descriptions.Item label="Phone">{dataViewDetail?.phone}</Descriptions.Item>
                         <Descriptions.Item label="Role">
                             <Badge status="processing" text = {dataViewDetail?.role}/>
