@@ -22,30 +22,18 @@ type FieldType ={
 const UpdateBook =(props:IProps) =>{
     const {updateBook,setUpdateBook,openViewUpdate,setOpenViewUpdate, refreshTable}=props
     const [form]= Form.useForm()
-    const [iSubmit, setIsSubmit] = useState<boolean>(false)
-    const {message,notification} =App.useApp()
-    const [listCategory, setListCategory] = useState<{
-        label:string,
-        value:string,
-    }[]>([])
-    const onClose =() =>{
-        setOpenViewUpdate(false);
-        setUpdateBook(null);
-    }
+    const [loadingThumbnail, setLoadingThumbnail] = useState<boolean>(false)
+    const [loadingSlider, setLoadingSlider] = useState<boolean>(false)
+
+    const [previewOpen, setPreviewOpen] = useState<boolean>(false)
+    const [previewImage, setPreviewImage] = useState<string>('')
+
+    const [fileListThumnail, setFileListThumnail] = useState<UploadFile[]>([])
+    const [fileListSlider, setFileListSlider] = useState<UploadFile[]>([])
+
     useEffect(()=>{
-        if (updateBook){
-            form.setFieldsValue({
-                _id:updateBook._id,
-                maintext:updateBook.mainText,
-                author:updateBook.author,
-                quantity:updateBook.quantity,
-                price:updateBook.price,
-                category:updateBook.quantity,
-                thumbnail:updateBook.thumbnail,
-                slider:updateBook.thumbnail,
-            })
-        }
-    },[updateBook])
+
+    },[])
     return (
         <>
             <Modal
@@ -171,7 +159,7 @@ const UpdateBook =(props:IProps) =>{
                                 <Upload
                                     action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                                     listType="picture-card"
-                                    // fileList={fileListSlider}
+                                    fileList={fileList || []}
                                     onChange={({ fileList }) => setFileListSlider(fileList)}
                                     // onPreview={onPreview}
                                     multiple

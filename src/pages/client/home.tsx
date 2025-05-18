@@ -1,4 +1,3 @@
-// Các import giữ nguyên
 import {
     Button,
     Checkbox,
@@ -109,8 +108,8 @@ const HomePage = () => {
     const items: TabsProps['items'] = [
         { key: 'sort=-sold', label: 'Most Popular', children: <></> },
         { key: 'sort=-updatedAt', label: 'Latest', children: <></> },
-        { key: 'sort=price', label: 'Price: High to Low', children: <></> },
-        { key: 'sort=-price', label: 'Price: Low to High', children: <></> },
+        { key: 'sort=-price', label: 'Price: High to Low', children: <></> },
+        { key: 'sort=+price', label: 'Price: Low to High', children: <></> },
     ];
 
     return (
@@ -152,20 +151,32 @@ const HomePage = () => {
                                             formatter={val => val?.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
                                             parser={val => val?.replace(/\./g, '') || ''}
                                             style={{ width: '100%' }}
+                                            step="1000"
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col xl={2} md={0}>
-                                    <div> - </div>
+                                <Col
+                                    xl={2}
+                                    md={0}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        height: "100%",
+                                        padding: 0,
+                                    }}
+                                >
+                                    <span style={{ fontSize: 20, fontWeight: "bold", lineHeight: 1 }}>-</span>
                                 </Col>
                                 <Col xl={11} md={24}>
                                     <Form.Item name={["range", "to"]} >
                                         <InputNumber
-                                            min={0}
+                                            min={20000}
                                             placeholder="To VND"
                                             formatter={val => val?.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
                                             parser={val => val?.replace(/\./g, '') || ''}
                                             style={{ width: '100%' }}
+                                            step="1000"
                                         />
                                     </Form.Item>
                                 </Col>
@@ -199,9 +210,13 @@ const HomePage = () => {
                             <Row className="customize-row" gutter={[16, 16]}>
                                 {listBook?.map((item,index) =>{
                                     return (
-                                        <>
                                             <div className={"column"} onClick={() => navigate(`/book/${item._id}`)}>
-                                                <Col key={`book-${index}`} xs={20} sm={8} md={6} lg={4} xl={4}>
+                                                <Col key={`book-${index}`}
+                                                     xs={24}
+                                                     sm={12}
+                                                     md={8}
+                                                     lg={6}
+                                                     xl={6}>
                                                     <div className="wrapper" style={{
                                                         border: "1px solid #eee",
                                                         padding: "20px",
@@ -245,7 +260,6 @@ const HomePage = () => {
                                                     </div>
                                                 </Col>
                                             </div>
-                                        </>
                                     )
                                 }
                                 )}

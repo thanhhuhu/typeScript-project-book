@@ -97,17 +97,17 @@ export const updateBooksAPI = (
     quantity:number,
     category:string,
     thumbnail:string,
-    slider:string,
+    slider:string[],
 ) =>{
     const urlBackend=`/api/v1/book/${_id}`;
-    return axios.put<IBackendRes<ICreateBook>>(urlBackend, {mainText, author,quantity, price,category, thumbnail, slider})
+    return axios.put<IBackendRes<IRegister>>(urlBackend, {mainText, author,quantity, price,category, thumbnail, slider})
 }
 export const getBookByIdAPI = (_id:string) =>{
     const urlBackend = `/api/v1/book/${_id}`;
     return axios.get<IBackendRes<IBookTable>>(urlBackend,
         {
             headers:{
-                delay:0
+                delay:1000
             }
         }
         )

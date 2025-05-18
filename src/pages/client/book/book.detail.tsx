@@ -1,23 +1,92 @@
 import ImageGallery from "react-image-gallery";
 import {useEffect, useRef, useState} from "react";
 import "./book.detail.scss";
-import {Col, Divider, Rate, Row} from "antd";
+import {App, Col, Divider, message, Rate, Row} from "antd";
 import {MinusOutlined, PlusOutlined} from "@ant-design/icons";
 import {FaShoppingCart} from "react-icons/fa";
 import "react-image-gallery/styles/css/image-gallery.css";
 import ModalGallery from "./modal.gallery.tsx";
+import {useCurrentApp} from "../../../components/context/app.context.tsx";
 interface IProps {
     currentBook: IBookTable| null
+
+}
+type UserAction = {
+    quantity:number
+    type:string
 }
 const BookDetail = (props:IProps) => {
     const {currentBook} = props;
+    const {carts, setCarts} =useCurrentApp()
     const [isOpenModalGallery, setIsOpenModalGallery] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const refGallery = useRef<ImageGallery>(null)
+    const [currentQuantity, setCurrentQuantity] = useState<number>(1)
+    const {message}= App.useApp()
     const handleOnClickImage =() =>{
         setIsOpenModalGallery(true);
         setCurrentIndex(refGallery?.current?.getCurrentIndex()??0);
     }
+    const handleChangeButton =(type:UserAction) =>{
+        if (type === 'PLUS' && currentBook){
+            if (currentQuantity === +currentQuantity.quantity){
+                return
+            }
+            setCurrentQuantity(currentQuantity + 1);
+        }
+        if (type === 'MINUS'){
+            if(currentQuantity - 1 <=0){
+                return
+            }
+            setCurrentQuantity(currentQuantity - 1);
+        }
+
+    }
+    const handleChangeInput = (value:string) =>{
+        if (!isNaN(+value)){
+            if (+value >0 && currentBook && +value < +currentBook.quantity){
+                    setCurrentQuantity(+value);
+            }
+        }
+    }
+    const handleOnClickCart = () =>{
+        console.log(`Current quanity: ${currentQuantity}`,[{_id: currentBook?._id, quantity: currentQuantity , detail: currentBook}]
+        );
+        const cartStorage = localStorage.getItem('carts');
+        if (cartStorage && currentBook){
+            //update
+            const carts = JSON.parse(cartStorage) as ICart[];
+
+            //check exits
+            let isExitIndex = carts.findIndex(c => c._id === currentBook?._id);
+            if ( isExitIndex > -1){
+                carts[isExitIndex].quantity = carts[isExitIndex].quanity + currentQuantity;
+            } else {
+                carts.push({
+                    _id:currentBook?._id,
+                    quantity: currentQuantity,
+                    detail: currentBook,
+                })
+            }
+            localStorage.setItem('carts', JSON.stringify(carts))
+
+            //sync react context
+            setCarts(carts);
+        }else {
+            //create
+            const data = [{
+                _id:currentBook?._id!,
+                quantity:currentQuantity,
+                detail:currentBook!,
+            }]
+            localStorage.setItem('carts', JSON.stringify(data))
+
+            //sync react context
+            setCarts(data)
+        }
+        message.success("Add to cart successfully!")
+    }
+    console.log(carts)
     const [imageGallery,setImageGallery] = useState<{
         original:string,
         thumbnail:string,
@@ -30,19 +99,19 @@ const BookDetail = (props:IProps) => {
             if (currentBook.thumbnail){
                 images.push(
                     {
-                        original:`${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook}`,
-                        thumbnail:`${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook}`,
+                        original: `${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook.thumbnail}`,
+                        thumbnail: `${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook.thumbnail}`,
                         originalClass:"original-image",
                         thumbnailClass:"thumnail-images"
                     },
                 )
             }
             if ( currentBook.slider) {
-                currentBook.slider?.map(item=>{
+                    currentBook.slider?.map(item=>{
                     images.push(
                         {
-                            original:`${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook}`,
-                            thumbnail:`${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook}`,
+                            original: `${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook.thumbnail}`,
+                            thumbnail: `${import.meta.env.VITE_BACKEND_URL}/images/book/${currentBook.thumbnail}`,
                             originalClass:"original-image",
                             thumbnailClass:"thumnail-images"
                         },
@@ -88,7 +157,7 @@ const BookDetail = (props:IProps) => {
                         <Row gutter={[20,20]} justify="center" align="middle">
                             <Col md={10} sm={24} xs={0}>
                                 <ImageGallery
-                                    items={images}
+                                    items={imageGallery}
                                     ref={refGallery}
                                     showPlayButton={false}
                                     showFullscreenButton={false}
@@ -101,7 +170,7 @@ const BookDetail = (props:IProps) => {
                             <Col md={14} sm={24}>
                                 <Col md={0} sm={24} xs={24}>
                                     <ImageGallery
-                                        items={images}
+                                        items={imageGallery}
                                         ref ={refGallery}
                                         showPlayButton={false}
                                         showFullscreenButton={false}
@@ -113,45 +182,58 @@ const BookDetail = (props:IProps) => {
                                 </Col>
                                 <Col span={24}>
                                     <div className={"author"}>Author <a href={"#"}>{currentBook?.author}</a></div>
-                                    <div className={"title"}>{{currentBook?.mainText}}</div>
+                                    <div className={"title"}>{currentBook?.mainText}</div>
                                     <div className={"rating"}>
-                                        <Rate
-                                            value={5}
-                                            disabled
-                                            style={{color:'yellow'}}
-                                        />
+                                        <Rate value={5} disabled style={{ color: "yellow" }} />
                                         <span className={"sold"}>
                                             <Divider type={"vertical"}/>
-                                            Sold {currentBook?.sold ?? 0}
+                                            Sold :  {currentBook?.sold ?? 0}
                                         </span>
                                     </div>
                                     <div className={"price"}>
                                         <span className={"currency"}>
                                                 {new Intl.NumberFormat("vn-VN", {
                                                     style: "currency",currency:'VND'
-                                                }).format({currentBook?.price ?? 0})}
+                                                }).format(currentBook?.price ?? 0)}
                                         </span>
                                     </div>
                                     <div className={"delivery"}>
                                         <div>
-                                            <span className={"left"}>Delivery</span>
+                                            <span className={"left"}>Delivery: </span>
                                             <span className={"right"}>Free-shipping</span>
                                         </div>
                                     </div>
                                     <div className={"quantity"}>
                                         <span className={"left"}>Quantity</span>
                                         <span className={"right"}>
-                                                <button><MinusOutlined/></button>
-                                                <input defaultValue={1}/>
-                                                <button><PlusOutlined/></button>
+                                                <button
+                                                    onClick={()=> handleChangeButton('MINUS')}
+                                                >
+                                                    <MinusOutlined/>
+                                                </button>
+                                                <input defaultValue={1}
+                                                    value={currentQuantity}
+                                                       id={"currentQuantity"}
+                                                       onChange={(event)=>handleChangeInput(event.target.value)}
+                                                />
+                                                <button
+                                                    onClick={() => handleChangeButton('PLUS')}
+                                                >
+                                                    <PlusOutlined/>
+                                                </button>
                                             </span>
                                     </div>
                                     <div className={"buy"}>
-                                        <button className={"cart"}>
+                                        <button
+                                            className={"cart"}
+                                            onClick={()=> handleOnClickCart()}
+                                        >
                                             <FaShoppingCart className={"icon-cart"}/>
                                             Add cart
                                         </button>
-                                        <button className={"now"}>Buy now</button>
+                                        <button
+                                            className={"now"}
+                                        >Buy now</button>
                                     </div>
                                 </Col>
                             </Col>
@@ -162,7 +244,7 @@ const BookDetail = (props:IProps) => {
                     isOpenModalGallery = {isOpenModalGallery}
                     setIsOpenModalGallery={setIsOpenModalGallery}
                     currentIndex={currentIndex}
-                    items ={images}
+                    items ={imageGallery}
                     title={currentBook?.mainText ?? ""}
                 />
             </div>

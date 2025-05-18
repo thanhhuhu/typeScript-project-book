@@ -1,6 +1,5 @@
 /* Container for the book items */
 .customize-row {
-  display: flex;
   flex-wrap: wrap;
   gap: 16px;
   margin-top: 20px;
@@ -10,6 +9,8 @@
 .column {
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
+  height: 100%;
+
 }
 
 /* Wrapper for each book */
@@ -22,7 +23,7 @@
   flex-direction: column;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   height: 100%;
-
+  width: 200px;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 

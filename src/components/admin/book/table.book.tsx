@@ -41,21 +41,22 @@ const TableBook = () =>{
     const [deleteBook, setDeleteBook] = useState<boolean >(false);
     const [openViewUpdate, setOpenViewUpdate] = useState<boolean>(false);
     const [updateBook, setUpdateBook] = useState<IBookTable| null>(null);
-    const columns: ProColumns<IUserTable>[] = [
+    const columns: ProColumns<IBookTable>[] = [
         {
             title: 'Id',
             dataIndex: '_id',
             hideInSearch: true,
-            render(entity){
-                return (
-                    <a href="#"
-                       onClick={() => {
-                            setDataViewDetail(entity)
-                            setOpenViewDetail(true)
-                       }}
-                    >{entity._id}</a>
-                )
-            }
+            render: (text, record) => (
+                <a
+                    href="#"
+                    onClick={() => {
+                        setDataViewDetail(record);
+                        setOpenViewDetail(true);
+                    }}
+                >
+                    {text}
+                </a>
+            )
         },
         {
             title: "Book name",

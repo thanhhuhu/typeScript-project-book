@@ -85,6 +85,12 @@ declare global {
         mainText: string;
         author: string;
     }
+    interface ICart{
+        _id: string;
+        quanity: string;
+        mainText: string;
+        carts:string[];
+    }
 }
 
 

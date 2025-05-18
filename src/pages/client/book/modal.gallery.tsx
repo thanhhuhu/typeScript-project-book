@@ -48,23 +48,30 @@ const ModalGallery = (props: IProps) => {
                         slideDuration={0}
                     />
                 </Col>
-                {
-                    items?.map((item, i) => (
-                        <Col key={`image-${i}`}>
-                            <Image
-                                className={"img-normal"}
-                                width={100}
-                                height={100}
-                                src={item.original}
-                                preview={false}
-                                onClick={() => {
-                                    refGallery.current?.slideToIndex(i);
-                                }}
-                            />
-                            <div className={activeIndex === i ? "active": ""}></div>
-                        </Col>
-                    ))
-                }
+                <Col span={8}>
+                    <div style={{padding:"5px 0 20px 0"}}>{title}</div>
+                    <div>
+                        <Row gutter={[20, 20]}>
+                            {
+                                items?.map((item, i) => (
+                                    <Col key={`image-${i}`}>
+                                        <Image
+                                            className={"img-normal"}
+                                            width={100}
+                                            height={100}
+                                            src={item.original}
+                                            preview={false}
+                                            onClick={() => {
+                                                refGallery.current?.slideToIndex(i);
+                                            }}
+                                        />
+                                        <div className={activeIndex === i ? "active": ""}></div>
+                                    </Col>
+                                ))
+                            }
+                        </Row>
+                    </div>
+                </Col>
             </Row>
         </Modal>
     );
